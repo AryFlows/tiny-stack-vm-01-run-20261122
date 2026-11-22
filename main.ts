@@ -1,48 +1,36 @@
-const{readdirSync:R,readFileSync:F,mkdirSync:K,writeFileSync:W}=require("fs");
-const{MAKEFUN_INPUT_DIR:A="/input",MAKEFUN_OUTPUT_DIR:B="/output"}=process.env;
-let O,T="#4d')-.2########,,,,,,,(,,,(,,,#,,,#############CGGC############(+##############''$'";
-function V(p,I){
-let D=[],t=0,C=[],u=0,M=[],l=0,i=0,x=0,g=0,a,b,r,v,s,H=65536,L=p.length;
-O=[];
-while(g++<1e6){
-if(x<0|x>=L)return 9;
-let k=p[x],c=T.charCodeAt(k)-35,m=c>>4,q=c>>2&3,w=c&3;
-if(x+m>=L)return 9;
-let n=x+1+m;
-if(t<q|t-q+w>256)return t<q?2:3;
-x=n;
-if(k==0)return 0;
-else if(k==1)D[t++]=p[n-1]<<24>>24;
-else if(k==2)D[t++]=p[n-4]|p[n-3]<<8|p[n-2]<<16|p[n-1]<<24;
-else if(k==3)t--;
-else if(k==4)D[t]=D[t-1],t++;
-else if(k==5)v=D[t-1],D[t-1]=D[t-2],D[t-2]=v;
-else if(k==6)D[t]=D[t-2],t++;
-else if(k==7)v=D[t-3],D[t-3]=D[t-2],D[t-2]=D[t-1],D[t-1]=v;
-else if(k==23)D[t-1]=-D[t-1]|0;
-else if(k==27)D[t-1]=~D[t-1];
-else if(k>47&k<51){r=(p[n-2]|p[n-1]<<8)<<16>>16;if(k==48||(v=D[--t],k==49?!v:!!v))x=n+r}
-else if(k==51){if(u==64)return 7;C[u++]=n,x=p[n-2]|p[n-1]<<8}
-else if(k==52){if(u==0)return 8;x=C[--u]}
-else if(k==64){if((a=D[t-1])<0|a>255)return 6;D[t-1]=M[a]|0}
-else if(k==65){if((a=D[t-1])<0|a>255)return 6;M[a]=D[t-2],t-=2}
-else if(k==80){s=""+D[t-1];if(l+s.length>H)return 11;t--,O.push(...Buffer.from(s)),l+=s.length}
-else if(k==81){if(l>=H)return 11;O[l++]=D[--t]&255}
-else if(k==82)D[t++]=i<I.length?I[i++]:-1;
-else if(k==83)return D[--t]&255;
-else if(k<16|k>34|k==31)return 5;
-else{
-b=D[t-1],a=D[t-2];
-if(b==0&k>18&k<23)return 4;
-r=k<23?k==16?a+b|0:k==17?a-b|0:k==18?Math.imul(a,b):k==19?a==-(2**31)&b==-1?a:(a/b)|0:k==20?b==-1?0:a%b|0:k==21?(a>>>0)/(b>>>0)|0:(a>>>0)%(b>>>0)|0:k<27?k==24?a&b:k==25?a|b:a^b:k<31?k==28?a<<(b&31):k==29?a>>(b&31):(a>>>(b&31))|0:k==32?+(a==b):k==33?+(a<b):(a>>>0)<(b>>>0)?1:0;
-t-=2,D[t++]=r;
+import{readFileSync as R,readdirSync as D,mkdirSync as M,writeFileSync as W}from'fs'
+const E=process.env,T=`!2b%'+,0        *******&***&*** ***             AEEA!           &)              %%"%`,I=E.MAKEFUN_INPUT_DIR||'/input',O=E.MAKEFUN_OUTPUT_DIR||'/output',F=c=>{throw c}
+D(I).map(d=>{
+let P=R(I+'/'+d+'/program.bin'),N=R(I+'/'+d+'/input.bin'),n=P.length,S=[],C=[],m=[],o='',G=O+'/'+d,p=0,s=0,i=0
+try{
+for(;s<1e6;s++){
+if(p<0||p>=n)F(9)
+let q=P[p],k=T.charCodeAt(q)-33
+if(!(k>=0))F(5)
+let u=k>>4,v=k>>2&3,w=k&3
+if(p+u>=n)F(9)
+let x=p+1+u
+if(S.length<v)F(2)
+if(S.length-v+w>256)F(3)
+p=x
+if(!q)F(0)
+else if(q<3)S.push(P.readIntLE(x-u,u))
+else if(q>2&&q<8){let t=S.splice(-v);for(const c of['','00','10','010','120'][q-3])S.push(t[c])}
+else if(q<35){
+let b=S.pop(),a=(q==23|q==27)?b:S.pop(),A=a>>>0,B=b>>>0,c=b&31
+if(q>18&&q<23&&!b)F(4)
+S.push([a+b,a-b,Math.imul(a,b),a/b,a%b,A/B,A%B,-a,a&b,a|b,a^b,~a,a<<c,a>>c,a>>>c,0,a==b,a<b,A<B][q-16]|0)
 }
+else if(q<53){
+if(q==52)p=C.pop()??F(8)
+else if(q==51){if(C.push(x)>64)F(7);p=P[x-2]|P[x-1]<<8}
+else{let y=v?S.pop():0;if(!v|!y==(q==49))p=x+P.readInt16LE(x-2)}
 }
-return 10;
+else if(q<66){let a=S.pop();if(a>>>0>255)F(6);w?S.push(m[a]||0):m[a]=S.pop()}
+else if(q>79&&q<82){let t=q==80?S.pop()+'':0;if(o.length+(q==80?t.length:1)>65536)F(11);q==80?o+=t:o+=String.fromCharCode(S.pop())}
+else if(q==82)S.push(N[i++]??-1)
+else F(S.pop()&255)
 }
-R(A).map(d=>{
-let e=V(F(A+"/"+d+"/program.bin"),F(A+"/"+d+"/input.bin")),y=B+"/"+d;
-K(y,{recursive:!0});
-W(y+"/stdout.bin",Buffer.from(O));
-W(y+"/exit.txt",e+"");
-});
+F(10)
+}catch(e){M(G,{recursive:true});W(G+'/stdout.bin',o,'binary');W(G+'/exit.txt',(e|0)+'\n')}
+})
